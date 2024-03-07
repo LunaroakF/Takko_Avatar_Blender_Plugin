@@ -14,7 +14,7 @@ class Curve_Binding_Tool_Ui(bpy.types.Panel):
         layout = self.layout
         box = layout.box()
         box.prop(context.scene,'curve_binding_tool_armature',text = "骨架物体 ")
-        box.prop(context.scene,'curve_binding_tool_bone_layer',text = "骨骼层 ")
+        box.prop(context.scene,'curve_binding_tool_bone_collection_name',text = "骨骼集合 ")
         box.prop(context.scene,'curve_binding_tool_bone_count',text = "段数 ")
 
         box = layout.box()

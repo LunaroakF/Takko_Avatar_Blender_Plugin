@@ -10,15 +10,30 @@ from .Core import Mesh
 from .Core import VertexGroup
 from .Core import Modifier
 
+# 同DecorationTool
+enum_list = []
+def Get_Bone_Collection_Items(self, context):
+    global enum_list
+    arm = context.scene.curve_binding_tool_armature
+    if arm is None:return []
+    bone_grps = Armature.Collections_All_Get(arm)
+    enum_list = []
+    for grp in bone_grps:
+        enum_list.append((grp,grp,""))
+    return enum_list
+
+
 #骨架物体
 def ArmatureObj(self,object): return object.type == 'ARMATURE'
 bpy.types.Scene.curve_binding_tool_armature = bpy.props.PointerProperty(
         type=bpy.types.Object,
         poll= ArmatureObj )
 
-#骨骼层级
-bpy.types.Scene.curve_binding_tool_bone_layer = bpy.props.IntProperty(
-    default = 0, min = 0, max= 31)
+# 骨骼集合名称
+bpy.types.Scene.curve_binding_tool_bone_collection_name =  bpy.props.EnumProperty(
+        name='身体骨骼集合',
+        items=Get_Bone_Collection_Items,
+    )
 
 #段数
 bpy.types.Scene.curve_binding_tool_bone_count = bpy.props.IntProperty(
@@ -69,7 +84,9 @@ class Curve_Binding_Tool_OT_Bind(bpy.types.Operator):
         sp_name = context.scene.curve_binding_tool_bone_name
         if sp_name == "": return Log.Error_Cancelled(self,"未设置动骨名称")
 
-        layer = context.scene.curve_binding_tool_bone_layer
+        # 骨骼集合名称
+        collection_name = context.scene.curve_binding_tool_bone_collection_name
+
         merge_end = context.scene.curve_binding_tool_merge_end
 
         #记录UV信息
@@ -148,6 +165,11 @@ class Curve_Binding_Tool_OT_Bind(bpy.types.Operator):
         Obj.Acive_Set(temp_arm_Obj)
         Mode.Switch_Edit()
         name_parent = None
+
+        # 创建骨骼集合
+        Armature.New_Collection(temp_arm_Obj,collection_name)
+
+        # 创建骨骼
         for i in range(len(positions) - 1):
             sp_joint_index = i + 1
             name_bone = Word.Spring_Bone_Name_Build(sp_name,sp_index,sp_joint_index,sp_direction,sp_prefix)
@@ -157,12 +179,14 @@ class Curve_Binding_Tool_OT_Bind(bpy.types.Operator):
             Armature.Edit_Bone_Transform_Set(
                 temp_arm_Obj,edit_bone,
                 positions[i],positions[i+1],0)    
-            #设置父级
+            #设置父级, 连接
             if name_parent is not None:
-                Armature.Edit_Bone_Parent_Set(temp_arm_Obj,name_bone,name_parent)
-            #设置层级
-            Armature.Edit_Bone_Layers_Set(temp_arm_Obj,name_bone,layer)
+                Armature.Edit_Bone_Parent_Set(temp_arm_Obj,name_bone,name_parent,True)
+            
+            # 指定骨骼集合
+            Armature.Assign_Edit_Bone_To_Collection(temp_arm_Obj,edit_bone,collection_name)
             name_parent = name_bone
+
         Mode.Switch_Object()
 
         #转化成网格体

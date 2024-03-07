@@ -8,28 +8,26 @@ from .Core import Mode
 from .Core import Constraint
 from .Core import Modifier
 
-#global的防止乱码 https://devtalk.blender.org/t/enumproperty-and-string-encoding/7835
+# global的防止乱码 https://devtalk.blender.org/t/enumproperty-and-string-encoding/7835
+# 获取骨骼集合名称组成一个列表
 enum_list = []
 def Get_Bone_Collection_Items(self, context):
     global enum_list
     arm = context.scene.decoration_constraint_tool_main_armature
     if arm is None:return []
-    bone_grps = Armature.Bone_Collection_All_Get(arm)
+    bone_grps = Armature.Collections_All_Get(arm)
     enum_list = []
     for grp in bone_grps:
         enum_list.append((grp,grp,""))
     return enum_list
 
-
-
-#骨架物体
+# 骨架物体
 bpy.types.Scene.decoration_constraint_tool_main_armature = bpy.props.PointerProperty(
         name ="主骨架",
         type= bpy.types.Object,
         poll= Poll.ArmatureObj )
-# bpy.types.Scene.decoration_constraint_tool_bone_group_name = bpy.props.StringProperty(
-#     name ="身体骨骼组",default = "body")
 
+# 骨骼集合名称
 bpy.types.Scene.decoration_constraint_tool_bone_collection_name =  bpy.props.EnumProperty(
         name='身体骨骼集合',
         items=Get_Bone_Collection_Items,
@@ -60,7 +58,7 @@ class Decoration_Constraint_Tool_OT_Seperate(bpy.types.Operator):
         #通过骨骼组获取身体骨骼
         collection_name = context.scene.decoration_constraint_tool_bone_collection_name
         if collection_name == "": return Log.Error_Cancelled(self,"请指定身体骨骼所在骨骼集合")
-        if not Armature.Bone_Collection_Exist(main_armObj,collection_name): return Log.Error_Cancelled(self,"主骨架中并不包含 {} 这个骨骼集合".format(collection_name))
+        if not Armature.Is_Collection_Exist(main_armObj,collection_name): return Log.Error_Cancelled(self,"主骨架中并不包含 {} 这个骨骼集合".format(collection_name))
         body_bones = Armature.Get_Bones_From_Collection(main_armObj,collection_name)
         if(len(body_bones) == 0): return Log.Error_Cancelled(self,"骨骼集合没有指定骨骼")
 

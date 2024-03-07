@@ -109,18 +109,18 @@ def Bones_From_Group(armObj,groupName):
     return bones
 
 #确定骨骼集合是否存在
-def Bone_Collection_Exist(armObj,collectionName):
+def Is_Collection_Exist(armObj,collectionName):
     if armObj.data.collections.find(collectionName) == -1: return False
     return True
 
 #根据骨架物体获得全部骨骼集合
-def Bone_Collection_All_Get(armObj):
+def Collections_All_Get(armObj):
     bone_collection_names = []
     for collection in armObj.data.collections:
         bone_collection_names.append(collection.name)
     return bone_collection_names
 
-#获取骨骼集合中的全部骨骼
+#获取骨骼集合中的全部骨骼, 编辑模式下会返回空列表, 因为退出编辑模式后才会同步
 def Get_Bones_From_Collection(armObj,collectionName):
     bones = []
     for bone in armObj.data.bones:
@@ -131,10 +131,16 @@ def Get_Bones_From_Collection(armObj,collectionName):
                     break
     return bones
 
+# 创建骨骼集合
+def New_Collection(armObj,collectionName):
+    armObj.data.collections.new(collectionName)
+
+# 把骨骼添加到骨骼集合, 
+def Assign_Edit_Bone_To_Collection(armobj, editBoneName, collectionName):
+    # 如果在编辑模式下创建新的骨骼, 没退出编辑模式前, armobj.data.bones的数据不黑更新
+    armobj.data.collections[collectionName].assign(armobj.data.edit_bones[editBoneName])
 
 
 #约束
-
-
 
 #制作骨骼树收效甚微，因为Blender不像Unity能有个根节点来按层获取
