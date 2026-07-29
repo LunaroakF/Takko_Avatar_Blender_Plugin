@@ -1,5 +1,5 @@
 import math
-from msilib.schema import Error
+#from msilib.schema import Error #错误调试会导致插件无法在Blender5.1.0或更高运行
 from multiprocessing.sharedctypes import Value
 from operator import mod
 import bpy

@@ -1,4 +1,4 @@
-from asyncio.windows_events import NULL
+#from asyncio.windows_events import NULL #此行局限与Windows操作系统，删除得以与Linux&MacOS兼容
 from unittest import result
 import bpy
 from enum import Enum

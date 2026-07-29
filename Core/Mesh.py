@@ -1,4 +1,4 @@
-from cgitb import reset
+#from cgitb import reset #调试会导致插件无法在Blender5.1.0或更高运行
 from unittest import result
 import bpy
 import bmesh
